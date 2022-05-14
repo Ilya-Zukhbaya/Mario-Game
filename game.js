@@ -40,25 +40,49 @@ scene("game", () => {
 
     let scalePipe = scale(0.5)
 
-
-
     const levelConfig = {
         width: 20,
         height: 20,
-        '=': [sprite('Block', solid())], // solid () - means that player cannot pass through these sprites, that are markable as solid()
+        '=': [sprite('Block'), solid()], // solid () - means that player cannot pass through these sprites, that are markable as solid()
         '$': [sprite('Coin')],
         '#': [sprite('EvilShroom'), solid()],
         '@': [sprite('Mushroom'), solid()],
         '%': [sprite('Surprise'), solid(), 'coin-surprise'],
         '&': [sprite('Surprise'), solid(), 'mushroom-surprise'],
         '^': [sprite('Unboxed'), solid()],
-        '<': [sprite('Pipe-Top-Left', solid()), scalePipe],
-        '>': [sprite('Pipe-Top-Right', solid()), scalePipe],
-        '(': [sprite('Pipe-Bottom-Left', solid()), scalePipe],
-        ')': [sprite('Pipe-Bottom-Right', solid()), scalePipe]
+        '<': [sprite('Pipe-Top-Left'), solid(), scalePipe],
+        '>': [sprite('Pipe-Top-Right'), solid(), scalePipe],
+        '(': [sprite('Pipe-Bottom-Left'), solid(), scalePipe],
+        ')': [sprite('Pipe-Bottom-Right'), solid(), scalePipe]
     }
 
+    const playerScore = add([
+        text('score'),
+        pos(10, 10),
+        layer('UI'),
+        {
+            value: 'score',
+        }
+    ])
+
+    add([text('level' + 'test', pos(10, 20))])
+
     const gameLevel = addLevel(map, levelConfig)
+
+    const player = add([
+        sprite('Mario'), solid(),
+        pos(10,100),
+        body(),
+        origin('bot')
+    ])
+
+    keyDown('left', () => {
+        player.move(-120, 0) // x and y axis
+    })
+
+    keyDown('space', () => {
+        player.jump()
+    })
 })
 
 start("game")
