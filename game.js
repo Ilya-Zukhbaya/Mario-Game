@@ -21,7 +21,7 @@ loadSprite('Pipe-Bottom-Left', 'c1cYSbt.png')
 loadSprite('Pipe-Bottom-Right', 'nqQ79eI.png')
 
 scene("game", () => {
-    layers(['background', 'gmar', 'UI'], 'obj')
+    layers(['background', 'obj', 'UI'], 'obj')
 
     const map = [
         '                                              ',
@@ -30,12 +30,12 @@ scene("game", () => {
         '                                              ',
         '                                              ',
         '                                              ',
-        '               %    =&=%=                     ',
         '                                              ',
+        '                 %    =&=%=                   ',
         '                                              ',
         '                                   <>         ',
         '             @     #        #      ()         ',
-        '========= ===========================  ======='
+        '=========   =========================  ======='
     ]
 
     let scalePipe = scale(0.5)
@@ -80,8 +80,14 @@ scene("game", () => {
         player.move(-120, 0) // x and y axis
     })
 
-    keyDown('space', () => {
-        player.jump()
+    keyPress('space', () => {
+        if (player.grounded()){
+            player.jump(360)
+        }
+    })
+
+    keyDown('right', () => {
+        player.move(120, 0)
     })
 })
 
