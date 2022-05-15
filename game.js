@@ -6,6 +6,11 @@ kaboom({
     clearColor:[0, 0, 0, 1] // Метод, позволяющий очистить бэк и поставить цвет [red, green, blue, alpha]
 })
 
+const MOVE_SPEED = 120
+const JUMP_FORSE = 360
+const BIG_JUMP_FORSE = 480
+let CURRENT_JUMP_FORCE = JUMP_FORSE
+
 loadRoot('https://i.imgur.com/')
 loadSprite('Coin', 'wbKxhcd.png')
 loadSprite('EvilShroom', 'KPO3fR9.png')
@@ -86,11 +91,13 @@ scene("game", () => {
             },
             smallify(){
                 this.scale = vec2(1)
+                CURRENT_JUMP_FORCE = JUMP_FORSE
                 timer = 0
                 isBig - false
             },
             biggify(time){
                 this.scale = vec2(2)
+                CURRENT_JUMP_FORCE = BIG_JUMP_FORSE
                 timer = time
                 isBig = true
             }
@@ -119,7 +126,7 @@ scene("game", () => {
     })
 
     action('Mushroom', (m) => {
-        m.move(10, 0)
+        m.move(20, 0)
     })
 
     // Box event
@@ -137,17 +144,17 @@ scene("game", () => {
     })
 
     keyDown('left', () => {
-        player.move(-120, 0) // x and y axis
+        player.move(-MOVE_SPEED, 0) // x and y axis
     })
 
     keyPress('space', () => {
         if (player.grounded()){
-            player.jump(360)
+            player.jump(CURRENT_JUMP_FORCE)
         }
     })
 
     keyDown('right', () => {
-        player.move(120, 0)
+        player.move(MOVE_SPEED, 0)
     })
 })
 
