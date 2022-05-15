@@ -6,6 +6,11 @@ kaboom({
     clearColor:[0, 0, 0, 1] // Метод, позволяющий очистить бэк и поставить цвет [red, green, blue, alpha]
 })
 
+const MOVE_SPEED = 120
+const JUMP_FORSE = 360
+const BIG_JUMP_FORSE = 480
+let CURRENT_JUMP_FORCE = JUMP_FORSE
+
 loadRoot('https://i.imgur.com/')
 loadSprite('Coin', 'wbKxhcd.png')
 loadSprite('EvilShroom', 'KPO3fR9.png')
@@ -31,7 +36,7 @@ scene("game", () => {
         '                                              ',
         '                                              ',
         '                                              ',
-        '   %              %    =&=%=                  ',
+        '                  %    =&=%=                  ',
         '                                              ',
         '                                   <>         ',
         '                   #        #      ()         ',
@@ -44,7 +49,7 @@ scene("game", () => {
         width: 20,
         height: 20,
         '=': [sprite('Block'), solid()], // solid () - means that player cannot pass through these sprites, that are markable as solid()
-        '$': [sprite('Coin')],
+        '$': [sprite('Coin'), 'Coin'],
         '#': [sprite('EvilShroom'), solid()],
         '%': [sprite('Surprise'), solid(), 'coin-surprise'],
         '&': [sprite('Surprise'), solid(), 'mushroom-surprise'],
@@ -69,14 +74,14 @@ scene("game", () => {
 
     const gameLevel = addLevel(map, levelConfig)
 
-    function bigPlayer(){
+    function big() {
         let timer = 0
         let isBig = false
         return {
-            update(){
-                if (isBig){
-                    timer -= dt // Get the delta time since last frame.
-                    if (timer <= 0){
+            update() {
+                if (isBig) {
+                    timer -= dt() // Get the delta time since last frame.
+                    if (timer <= 0) {
                         this.smallify()
                     }
                 }
@@ -86,12 +91,14 @@ scene("game", () => {
             },
             smallify(){
                 this.scale = vec2(1)
+                CURRENT_JUMP_FORCE = JUMP_FORSE
                 timer = 0
                 isBig - false
             },
-            biggify(){
-                this.scale = vec2(2),
-                timer = time,
+            biggify(time){
+                this.scale = vec2(2)
+                CURRENT_JUMP_FORCE = BIG_JUMP_FORSE
+                timer = time
                 isBig = true
             }
         }
@@ -101,12 +108,25 @@ scene("game", () => {
         sprite('Mario'), solid(),
         pos(10,100),
         body(),
-        bigPlayer(),
+        big(),
         origin('bot')
     ])
 
+    // Interaction with mushroom and player
+    player.collides('Mushroom', (m) => {
+        destroy(m)
+        player.biggify(6) // for 5 sec
+    })
+
+    // Interaction with coin and player
+    player.collides('Coin', (c) => {
+        destroy(c)
+        playerScore.value++
+        playerScore.text = playerScore.value
+    })
+
     action('Mushroom', (m) => {
-        m.move(10, 0)
+        m.move(20, 0)
     })
 
     // Box event
@@ -124,17 +144,17 @@ scene("game", () => {
     })
 
     keyDown('left', () => {
-        player.move(-120, 0) // x and y axis
+        player.move(-MOVE_SPEED, 0) // x and y axis
     })
 
     keyPress('space', () => {
         if (player.grounded()){
-            player.jump(360)
+            player.jump(CURRENT_JUMP_FORCE)
         }
     })
 
     keyDown('right', () => {
-        player.move(120, 0)
+        player.move(MOVE_SPEED, 0)
     })
 })
 
