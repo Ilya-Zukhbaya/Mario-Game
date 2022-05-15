@@ -31,7 +31,7 @@ scene("game", () => {
         '                                              ',
         '                                              ',
         '                                              ',
-        '                 %    =&=%=                   ',
+        '   %              %    =&=%=                  ',
         '                                              ',
         '                                   <>         ',
         '             @     #        #      ()         ',
@@ -69,12 +69,55 @@ scene("game", () => {
 
     const gameLevel = addLevel(map, levelConfig)
 
+    function bigPlayer(){
+        let timer = 0
+        let isBig = false
+        return {
+            update(){
+                if (isBig){
+                    timer -= dt // Get the delta time since last frame.
+                    if (timer <= 0){
+                        this.smallify()
+                    }
+                }
+            },
+            isBig(){
+                return isBig
+            },
+            smallify(){
+                this.scale = vec2(1)
+                timer = 0
+                isBig - false
+            },
+            biggify(){
+                this.scale = vec2(2),
+                timer = time,
+                isBig = true
+            }
+        }
+    }
+
     const player = add([
         sprite('Mario'), solid(),
         pos(10,100),
         body(),
+        bigPlayer(),
         origin('bot')
     ])
+
+    // Box event
+    player.on("headbump", (obj) => {
+        if (obj.is('coin-surprise')) {
+            gameLevel.spawn('$', obj.gridPos.sub(0, 1))
+            destroy(obj)
+            gameLevel.spawn('^', obj.gridPos.sub(0, 0))
+        }
+        else if(obj.is('mushroom-surprise')){
+            gameLevel.spawn('@', obj.gridPos.sub(0, 1))
+            destroy(obj)
+            gameLevel.spawn('^', obj.gridPos.sub(0, 0))
+        }
+    })
 
     keyDown('left', () => {
         player.move(-120, 0) // x and y axis
