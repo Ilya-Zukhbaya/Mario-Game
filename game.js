@@ -44,7 +44,7 @@ scene("game", () => {
         width: 20,
         height: 20,
         '=': [sprite('Block'), solid()], // solid () - means that player cannot pass through these sprites, that are markable as solid()
-        '$': [sprite('Coin')],
+        '$': [sprite('Coin'), 'Coin'],
         '#': [sprite('EvilShroom'), solid()],
         '%': [sprite('Surprise'), solid(), 'coin-surprise'],
         '&': [sprite('Surprise'), solid(), 'mushroom-surprise'],
@@ -69,14 +69,14 @@ scene("game", () => {
 
     const gameLevel = addLevel(map, levelConfig)
 
-    function bigPlayer(){
+    function big() {
         let timer = 0
         let isBig = false
         return {
-            update(){
-                if (isBig){
-                    timer -= dt // Get the delta time since last frame.
-                    if (timer <= 0){
+            update() {
+                if (isBig) {
+                    timer -= dt() // Get the delta time since last frame.
+                    if (timer <= 0) {
                         this.smallify()
                     }
                 }
@@ -89,9 +89,9 @@ scene("game", () => {
                 timer = 0
                 isBig - false
             },
-            biggify(){
-                this.scale = vec2(2),
-                timer = time,
+            biggify(time){
+                this.scale = vec2(2)
+                timer = time
                 isBig = true
             }
         }
@@ -101,9 +101,22 @@ scene("game", () => {
         sprite('Mario'), solid(),
         pos(10,100),
         body(),
-        bigPlayer(),
+        big(),
         origin('bot')
     ])
+
+    // Interaction with mushroom and player
+    player.collides('Mushroom', (m) => {
+        destroy(m)
+        player.biggify(6) // for 5 sec
+    })
+
+    // Interaction with coin and player
+    player.collides('Coin', (c) => {
+        destroy(c)
+        playerScore.value++
+        playerScore.text = playerScore.value
+    })
 
     action('Mushroom', (m) => {
         m.move(10, 0)
