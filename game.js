@@ -34,7 +34,7 @@ scene("game", () => {
         '   %              %    =&=%=                  ',
         '                                              ',
         '                                   <>         ',
-        '             @     #        #      ()         ',
+        '                   #        #      ()         ',
         '=========   =========================  ======='
     ]
 
@@ -46,14 +46,14 @@ scene("game", () => {
         '=': [sprite('Block'), solid()], // solid () - means that player cannot pass through these sprites, that are markable as solid()
         '$': [sprite('Coin')],
         '#': [sprite('EvilShroom'), solid()],
-        '@': [sprite('Mushroom'), solid()],
         '%': [sprite('Surprise'), solid(), 'coin-surprise'],
         '&': [sprite('Surprise'), solid(), 'mushroom-surprise'],
         '^': [sprite('Unboxed'), solid()],
         '<': [sprite('Pipe-Top-Left'), solid(), scalePipe],
         '>': [sprite('Pipe-Top-Right'), solid(), scalePipe],
         '(': [sprite('Pipe-Bottom-Left'), solid(), scalePipe],
-        ')': [sprite('Pipe-Bottom-Right'), solid(), scalePipe]
+        ')': [sprite('Pipe-Bottom-Right'), solid(), scalePipe],
+        '@': [sprite('Mushroom'), solid(), 'Mushroom', body()],
     }
 
     const playerScore = add([
@@ -105,6 +105,10 @@ scene("game", () => {
         origin('bot')
     ])
 
+    action('Mushroom', (m) => {
+        m.move(10, 0)
+    })
+
     // Box event
     player.on("headbump", (obj) => {
         if (obj.is('coin-surprise')) {
@@ -112,7 +116,7 @@ scene("game", () => {
             destroy(obj)
             gameLevel.spawn('^', obj.gridPos.sub(0, 0))
         }
-        else if(obj.is('mushroom-surprise')){
+        if(obj.is('mushroom-surprise')){
             gameLevel.spawn('@', obj.gridPos.sub(0, 1))
             destroy(obj)
             gameLevel.spawn('^', obj.gridPos.sub(0, 0))
