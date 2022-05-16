@@ -143,6 +143,13 @@ scene("game", ({ score }) => {
         }
     })
 
+    player.action(() => {
+        camPos(player.pos)
+        if (player.pos.y >= FALL_DEATH){
+            go('playerLose', {score: playerScore.value})
+        }
+    })
+
     action('Mushroom', (m) => {
         m.move(20, 0)
     })
