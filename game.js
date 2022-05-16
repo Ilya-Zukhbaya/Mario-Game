@@ -9,6 +9,9 @@ kaboom({
 const MOVE_SPEED = 120
 const JUMP_FORSE = 360
 const BIG_JUMP_FORSE = 480
+const ENEMY_SPEED = 20
+const FALL_DEATH = 400
+let isJumping = true
 let CURRENT_JUMP_FORCE = JUMP_FORSE
 
 loadRoot('https://i.imgur.com/')
@@ -25,7 +28,7 @@ loadSprite('Pipe-Top-Right', 'hj2GK4n.png')
 loadSprite('Pipe-Bottom-Left', 'c1cYSbt.png')
 loadSprite('Pipe-Bottom-Right', 'nqQ79eI.png')
 
-scene("game", () => {
+scene("game", ({ score }) => {
     layers(['background', 'obj', 'UI'], 'obj')
 
     const map = [
@@ -50,7 +53,7 @@ scene("game", () => {
         height: 20,
         '=': [sprite('Block'), solid()], // solid () - means that player cannot pass through these sprites, that are markable as solid()
         '$': [sprite('Coin'), 'Coin'],
-        '#': [sprite('EvilShroom'), solid()],
+        '#': [sprite('EvilShroom'), solid(), 'Danger'],
         '%': [sprite('Surprise'), solid(), 'coin-surprise'],
         '&': [sprite('Surprise'), solid(), 'mushroom-surprise'],
         '^': [sprite('Unboxed'), solid()],
@@ -62,11 +65,11 @@ scene("game", () => {
     }
 
     const playerScore = add([
-        text('score'),
-        pos(10, 10),
+        text(`Your score: ${score}`),
+        pos(50, 50),
         layer('UI'),
         {
-            value: 'score',
+            value: score,
         }
     ])
 
@@ -125,6 +128,28 @@ scene("game", () => {
         playerScore.text = playerScore.value
     })
 
+    // Interaction with dangerous mobs and player
+
+    action('Danger', (d) => {
+        d.move(-ENEMY_SPEED, 0)
+    })
+
+    player.collides('Danger', (d) => {
+        if (isJumping){
+            destroy(d)
+        }
+        else{
+            go('playerLose', {score: playerScore.value}) // Go to a scene, passing all rest args to scene callback.
+        }
+    })
+
+    player.action(() => {
+        camPos(player.pos)
+        if (player.pos.y >= FALL_DEATH){
+            go('playerLose', {score: playerScore.value})
+        }
+    })
+
     action('Mushroom', (m) => {
         m.move(20, 0)
     })
@@ -147,15 +172,26 @@ scene("game", () => {
         player.move(-MOVE_SPEED, 0) // x and y axis
     })
 
-    keyPress('space', () => {
-        if (player.grounded()){
-            player.jump(CURRENT_JUMP_FORCE)
-        }
-    })
-
     keyDown('right', () => {
         player.move(MOVE_SPEED, 0)
     })
+
+    player.action(() => {
+        if (player.grounded()){
+            isJumping = false
+        }
+    })
+
+    keyPress('space', () => {
+        if (player.grounded()){
+            isJumping = true
+            player.jump(CURRENT_JUMP_FORCE)
+        }
+    })
 })
 
-start("game")
+scene('playerLose', ({score}) => {
+    add([text(score, 32), origin('center'), pos(width()/2, height()/2)])
+})
+
+start("game", {score: 0})
