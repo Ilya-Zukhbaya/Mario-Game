@@ -11,6 +11,7 @@ const JUMP_FORSE = 360
 const BIG_JUMP_FORSE = 480
 const ENEMY_SPEED = 20
 const FALL_DEATH = 400
+const PIPE_TAG = 'Pipe'
 let isJumping = true
 let CURRENT_JUMP_FORCE = JUMP_FORSE
 
@@ -28,10 +29,16 @@ loadSprite('Pipe-Top-Right', 'hj2GK4n.png')
 loadSprite('Pipe-Bottom-Left', 'c1cYSbt.png')
 loadSprite('Pipe-Bottom-Right', 'nqQ79eI.png')
 
-scene("game", ({ score }) => {
+
+// Lvl 2 sprites
+
+
+
+scene("game", ({ level, score }) => {
     layers(['background', 'obj', 'UI'], 'obj')
 
-    const map = [
+    const maps = [
+    [   
         '                                              ',
         '                                              ',
         '                                              ',
@@ -42,9 +49,24 @@ scene("game", ({ score }) => {
         '                  %    =&=%=                  ',
         '                                              ',
         '                                   <>         ',
-        '                   #        #      ()         ',
+        '                   #        #      ()       $ ',
+        '=========   =========================  ======='
+    ],
+    [
+        '                                              ',
+        '                                              ',
+        '                                              ',
+        '                                              ',
+        '                                              ',
+        '                                              ',
+        '                                              ',
+        '                  %    =&=%=                  ',
+        '                                              ',
+        '                                   <>         ',
+        '                            #      ()       $ ',
         '=========   =========================  ======='
     ]
+]
 
     let scalePipe = scale(0.5)
 
@@ -57,8 +79,8 @@ scene("game", ({ score }) => {
         '%': [sprite('Surprise'), solid(), 'coin-surprise'],
         '&': [sprite('Surprise'), solid(), 'mushroom-surprise'],
         '^': [sprite('Unboxed'), solid()],
-        '<': [sprite('Pipe-Top-Left'), solid(), scalePipe],
-        '>': [sprite('Pipe-Top-Right'), solid(), scalePipe],
+        '<': [sprite('Pipe-Top-Left'), solid(), scalePipe, PIPE_TAG],
+        '>': [sprite('Pipe-Top-Right'), solid(), scalePipe, PIPE_TAG],
         '(': [sprite('Pipe-Bottom-Left'), solid(), scalePipe],
         ')': [sprite('Pipe-Bottom-Right'), solid(), scalePipe],
         '@': [sprite('Mushroom'), solid(), 'Mushroom', body()],
@@ -66,16 +88,16 @@ scene("game", ({ score }) => {
 
     const playerScore = add([
         text(`Your score: ${score}`),
-        pos(50, 50),
+        pos(50, 70),
         layer('UI'),
         {
             value: score,
         }
     ])
 
-    add([text('level' + 'test', pos(10, 20))])
+    add([text('level ' + parseInt(level + 1)), pos(50, 40)])
 
-    const gameLevel = addLevel(map, levelConfig)
+    const gameLevel = addLevel(maps[level], levelConfig)
 
     function big() {
         let timer = 0
@@ -126,6 +148,17 @@ scene("game", ({ score }) => {
         destroy(c)
         playerScore.value++
         playerScore.text = playerScore.value
+    })
+
+    // Interaction with Pipe and player
+
+    player.collides('Pipe', () => {
+        keyPress('down', () => {
+            go('game', {
+                level: level + 1,
+                score: playerScore.value
+            })
+        })
     })
 
     // Interaction with dangerous mobs and player
@@ -194,4 +227,4 @@ scene('playerLose', ({score}) => {
     add([text(score, 32), origin('center'), pos(width()/2, height()/2)])
 })
 
-start("game", {score: 0})
+start("game", {level: 0, score: 0})
