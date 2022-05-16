@@ -10,6 +10,7 @@ const MOVE_SPEED = 120
 const JUMP_FORSE = 360
 const BIG_JUMP_FORSE = 480
 const ENEMY_SPEED = 20
+const FALL_DEATH = 400
 let isJumping = true
 let CURRENT_JUMP_FORCE = JUMP_FORSE
 
@@ -129,27 +130,21 @@ scene("game", ({ score }) => {
 
     // Interaction with dangerous mobs and player
 
-    player.collides('Danger', (d) => {
-        go('playerLose', {score: playerScore.value}) // Go to a scene, passing all rest args to scene callback.
-    })
-
-    action('Mushroom', (m) => {
-        m.move(20, 0)
-    })
-
     action('Danger', (d) => {
+        d.move(-ENEMY_SPEED, 0)
+    })
+
+    player.collides('Danger', (d) => {
         if (isJumping){
             destroy(d)
         }
         else{
-            d.move(-ENEMY_SPEED, 0)
+            go('playerLose', {score: playerScore.value}) // Go to a scene, passing all rest args to scene callback.
         }
     })
 
-    player.action(() => {
-        if (player.grounded()){
-            isJumping = false
-        }
+    action('Mushroom', (m) => {
+        m.move(20, 0)
     })
 
     // Box event
@@ -170,15 +165,21 @@ scene("game", ({ score }) => {
         player.move(-MOVE_SPEED, 0) // x and y axis
     })
 
+    keyDown('right', () => {
+        player.move(MOVE_SPEED, 0)
+    })
+
+    player.action(() => {
+        if (player.grounded()){
+            isJumping = false
+        }
+    })
+
     keyPress('space', () => {
         if (player.grounded()){
             isJumping = true
             player.jump(CURRENT_JUMP_FORCE)
         }
-    })
-
-    keyDown('right', () => {
-        player.move(MOVE_SPEED, 0)
     })
 })
 
