@@ -66,7 +66,7 @@ scene("game", ({ score }) => {
 
     const playerScore = add([
         text(`Your score: ${score}`),
-        pos(10, 10),
+        pos(50, 50),
         layer('UI'),
         {
             value: score,
