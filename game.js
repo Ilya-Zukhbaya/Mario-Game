@@ -32,6 +32,11 @@ loadSprite('Pipe-Bottom-Right', 'nqQ79eI.png')
 
 // Lvl 2 sprites
 
+loadSprite('Blue-Block', 'fVscIbn.png')
+loadSprite('Blue-Brick', '3e5YRQd.png')
+loadSprite('Blue-Steel', 'gqVoI2b.png')
+loadSprite('Blue-EvilShroom', 'SvV4ueD.png')
+loadSprite('Blue-Surprise', 'RMqCc1G.png')
 
 
 scene("game", ({ level, score }) => {
@@ -53,22 +58,22 @@ scene("game", ({ level, score }) => {
         '=========   =========================  ======='
     ],
     [
-        '                                              ',
-        '                                              ',
-        '                                              ',
-        '                                              ',
-        '                                              ',
-        '                                              ',
-        '                                              ',
-        '                  %    =&=%=                  ',
-        '                                              ',
-        '                                   <>         ',
-        '                            #      ()       $ ',
-        '=========   =========================  ======='
+     '*                                                               *',
+     '*                                                               *',
+     '*                                                               *',
+     '*                                                               *',
+     '*                                   @    ?                      *',
+     '*                               -!!!!!!!!                       *',
+     '*                                                               *',
+     '*                  %    !!!+                                    *',
+     '*          +                              -                     *',
+     '*                                                         <>    *',
+     '*            ?                                            ()    *',
+     '!!!!!!!  !!!!!!!!!!   !!!!!!!!!!!!!!!!!!!!!!!!!!     !!!!!!!!!!!!'
     ]
 ]
 
-    let scalePipe = scale(0.5)
+    let scaleConfig = scale(0.5)
 
     const levelConfig = {
         width: 20,
@@ -79,11 +84,16 @@ scene("game", ({ level, score }) => {
         '%': [sprite('Surprise'), solid(), 'coin-surprise'],
         '&': [sprite('Surprise'), solid(), 'mushroom-surprise'],
         '^': [sprite('Unboxed'), solid()],
-        '<': [sprite('Pipe-Top-Left'), solid(), scalePipe, PIPE_TAG],
-        '>': [sprite('Pipe-Top-Right'), solid(), scalePipe, PIPE_TAG],
-        '(': [sprite('Pipe-Bottom-Left'), solid(), scalePipe],
-        ')': [sprite('Pipe-Bottom-Right'), solid(), scalePipe],
+        '<': [sprite('Pipe-Top-Left'), solid(), scaleConfig, PIPE_TAG],
+        '>': [sprite('Pipe-Top-Right'), solid(), scaleConfig, PIPE_TAG],
+        '(': [sprite('Pipe-Bottom-Left'), solid(), scaleConfig],
+        ')': [sprite('Pipe-Bottom-Right'), solid(), scaleConfig],
         '@': [sprite('Mushroom'), solid(), 'Mushroom', body()],
+        '!': [sprite('Blue-Block'), solid(), scaleConfig],
+        '*': [sprite('Blue-Brick'), solid(), scaleConfig],
+        '?': [sprite('Blue-EvilShroom'), solid(), 'Danger', scaleConfig],
+        '+': [sprite('Blue-Surprise'), solid(), 'coin-surprise', scaleConfig],
+        '-': [sprite('Blue-Surprise'), solid(), 'mushroom-surprise', scaleConfig],
     }
 
     const playerScore = add([
@@ -131,7 +141,7 @@ scene("game", ({ level, score }) => {
 
     const player = add([
         sprite('Mario'), solid(),
-        pos(10,100),
+        pos(40,100),
         body(),
         big(),
         origin('bot')
@@ -155,7 +165,7 @@ scene("game", ({ level, score }) => {
     player.collides('Pipe', () => {
         keyPress('down', () => {
             go('game', {
-                level: level + 1,
+                level: (level + 1) % maps.length,
                 score: playerScore.value
             })
         })
